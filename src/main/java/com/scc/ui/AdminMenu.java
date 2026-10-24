@@ -37,6 +37,8 @@ public class AdminMenu {
 
                 switch (choice){
                     case "1" ->viewAllUser();
+                    case "2" ->viewPendingUsers();
+                    case "3" ->approveUser();
                     default -> System.out.println("-> [ERROR] Invalid Option.");
                 }
 
@@ -63,7 +65,37 @@ public class AdminMenu {
         displayUserTable(userDao.getAllUser(), "ALL REGISTERED USER");
     }
 
+    private void viewPendingUsers(){
+        displayUserTable(userDao.getPendingUser(), "PENDING APPROVALS");
+
+    }
+    private void approveUser(){
+        List<user> pendingUsers = userDao.getPendingUser();
+        displayUserTable(pendingUsers, "PENDING APPROVALS");
+
+        if (pendingUsers.isEmpty()){
+            return;
         }
+
+
+        System.out.print("Enter User ID to Approve (or 0 to cancel):  ");
+        int userId = scanner.nextInt();
+
+
+
+        if (userId == 0){
+            System.out.println(" -> Operation Cancelled by the user. ");
+        }
+        boolean exits = pendingUsers.stream().anyMatch(u ->u.id() == userId);
+        if(!exits){
+            System.out.println(" -> [ERROR] User ID not found");
+            return;
+        }
+
+        userDao.approveUser(userId);
+    }
+
+}
 
 
 
