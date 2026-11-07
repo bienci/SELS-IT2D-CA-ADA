@@ -5,4 +5,7 @@ public class DatabaseInitializer {
         new UserDao();
         System.out.println("-> Database table verified");
     }
+
+
+
 }
