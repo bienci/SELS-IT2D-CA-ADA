@@ -5,7 +5,7 @@ public class ActivityLog {
 
     private int logsId;
     private int userId;
-    private String actionType;
+    private String actiontype;
     private String description;
     private String datetime;
 
@@ -14,7 +14,7 @@ public class ActivityLog {
                        String datetime) {
         this.logsId = logsId;
         this.userId = userId;
-        this.actionType = actionType;
+        this.actiontype = actiontype;
         this.description = description;
         this.datetime = datetime;
     }
@@ -28,7 +28,7 @@ public class ActivityLog {
     }
 
     public String getActionType() {
-        return actionType;
+        return actiontype;
     }
 
     public String getDescription() {

@@ -58,7 +58,7 @@ public class UserDao {
     }
 
     public user login(String username, String password) {
-        String sql = "SELECT id, username, password, roles, status " +
+        String sql = "SELECT user_id, username, password, roles, status " +
                 "FROM users WHERE username = ? AND password = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -78,7 +78,7 @@ public class UserDao {
                     }
 
                     user loggedInUser = new user(
-                            rs.getInt("id"),
+                            rs.getInt("user_id"),
                             rs.getString("username"),
                             rs.getString("password"),
                             rs.getString("roles"),
@@ -87,7 +87,7 @@ public class UserDao {
 
                     // Record successful login
                     logActivity(
-                            loggedInUser.id(),
+                            loggedInUser.user_id(),
                             "LOGIN",
                             "User logged into the system."
                     );
@@ -109,7 +109,7 @@ public class UserDao {
     public List<user> getAllUser() {
         List<user> usersList = new ArrayList<>();
 
-        String sql = "SELECT id, username, password, roles, status FROM users";
+        String sql = "SELECT user_id, username, password, roles, status FROM users";
 
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
@@ -117,7 +117,7 @@ public class UserDao {
 
             while (rs.next()) {
                 usersList.add(new user(
-                        rs.getInt("id"),
+                        rs.getInt("user_id"),
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getString("roles"),
@@ -135,7 +135,7 @@ public class UserDao {
     public List<user> getPendingUser() {
         List<user> pendingList = new ArrayList<>();
 
-        String sql = "SELECT id, username, password, roles, status " +
+        String sql = "SELECT user_id, username, password, roles, status " +
                 "FROM users WHERE status = 'PENDING'";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -144,7 +144,7 @@ public class UserDao {
 
             while (rs.next()) {
                 pendingList.add(new user(
-                        rs.getInt("id"),
+                        rs.getInt("user_id"),
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getString("roles"),
@@ -160,7 +160,7 @@ public class UserDao {
     }
 
     public boolean approveUser(int userId) {
-        String sql = "UPDATE users SET status = 'APPROVED' WHERE id = ?";
+        String sql = "UPDATE users SET status = 'APPROVED' WHERE user_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -184,7 +184,7 @@ public class UserDao {
     }
 
     public boolean updateUserAndStatus(int userId, String newRoles, String newStatus) {
-        String sql = "UPDATE users SET roles = ?, status = ? WHERE id = ?";
+        String sql = "UPDATE users SET roles = ?, status = ? WHERE user_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

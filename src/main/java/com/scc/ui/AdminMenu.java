@@ -46,7 +46,7 @@ public class AdminMenu {
                 case "7" -> userDao.displayAuditLogs();
                 case "8" -> {
                     userDao.logActivity(
-                            admin.id(),
+                            admin.user_id(),
                             "LOGOUT",
                             "Admin logged out of the system."
                     );
@@ -73,7 +73,7 @@ public class AdminMenu {
 
         for (user u : users) {
             System.out.printf("| %-3d | %-15s | %-10s | %-10s |%n",
-                    u.id(), u.username(), u.roles(), u.status());
+                    u.user_id(), u.username(), u.roles(), u.status());
         }
 
         System.out.println("+-----+-----------------+------------+------------+");
@@ -103,7 +103,7 @@ public class AdminMenu {
             return;
         }
 
-        boolean exists = pendingUsers.stream().anyMatch(u -> u.id() == userId);
+        boolean exists = pendingUsers.stream().anyMatch(u -> u.user_id() == userId);
 
         if (!exists) {
             System.out.println("-> [ERROR] User ID not found.");
@@ -112,7 +112,7 @@ public class AdminMenu {
 
         if (userDao.approveUser(userId)) {
             userDao.logActivity(
-                    admin.id(),
+                    admin.user_id(),
                     "APPROVE_USER",
                     "Admin approved user account with ID: " + userId
             );
@@ -135,14 +135,14 @@ public class AdminMenu {
             return;
         }
 
-        boolean exists = users.stream().anyMatch(u -> u.id() == userId);
+        boolean exists = users.stream().anyMatch(u -> u.user_id() == userId);
 
         if (!exists) {
             System.out.println("-> [ERROR] User ID not found.");
             return;
         }
 
-        if (userId == currentAdmin.id()) {
+        if (userId == currentAdmin.user_id()) {
             System.out.println("-> [WARNING] Modifying the currently active admin is restricted.");
             return;
         }
@@ -163,7 +163,7 @@ public class AdminMenu {
 
         if (userDao.updateUserAndStatus(userId, newRole, newStatus)) {
             userDao.logActivity(
-                    currentAdmin.id(),
+                    currentAdmin.user_id(),
                     "UPDATE_USER",
                     "Admin updated user ID: " + userId +
                             " | New role: " + newRole +
