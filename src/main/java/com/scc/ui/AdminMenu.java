@@ -40,9 +40,9 @@ public class AdminMenu {
                 case "1" -> viewAllUser();
                 case "2" -> viewPendingUsers();
                 case "3" -> approveUser(admin);
-                case "4" -> System.out.println("Add New User is not implemented yet.");
+                case "4" -> addNewUser(admin);
                 case "5" -> updateUser(admin);
-                case "6" -> System.out.println("Delete User Account is not implemented yet.");
+                case "6" -> deleteUser(admin);
                 case "7" -> userDao.displayAuditLogs();
                 case "8" -> {
                     userDao.logActivity(
@@ -221,6 +221,113 @@ public class AdminMenu {
             } catch (NumberFormatException e) {
                 System.out.println("-> [ERROR] Please enter a valid numeric ID.");
             }
+        }
+    }
+
+    private void addNewUser(user admin) {
+
+        System.out.println("\n========== ADD NEW USER ==========");
+
+        System.out.print("Enter Username: ");
+        String username = scanner.nextLine().trim();
+
+        if (username.isEmpty()) {
+            System.out.println("-> [ERROR] Username cannot be empty.");
+            return;
+        }
+
+        System.out.print("Enter Password: ");
+        String password = scanner.nextLine().trim();
+
+        if (password.isEmpty()) {
+            System.out.println("-> [ERROR] Password cannot be empty.");
+            return;
+        }
+
+        String role = readValidRole();
+
+        if (role == null) {
+            System.out.println("-> Operation cancelled.");
+            return;
+        }
+
+        // Register the new user
+        if (userDao.registerUser(username, password, role)) {
+
+            userDao.logActivity(
+                    admin.user_id(),
+                    "ADD_USER",
+                    "Admin added a new user: " + username +
+                            " | Role: " + role
+            );
+
+            System.out.println("-> User registered successfully!");
+            System.out.println("-> Account Status: PENDING");
+
+        } else {
+            System.out.println("-> [ERROR] Failed to register user.");
+        }
+    }
+    private void deleteUser(user admin) {
+
+        System.out.println("\n========== DELETE USER ACCOUNT ==========");
+
+        List<user> users = userDao.getAllUser();
+
+        displayUserTable(users, "REGISTERED USERS");
+
+        if (users.isEmpty()) {
+            return;
+        }
+
+        int userId = readIntInput(
+                "Enter User ID to delete (or 0 to cancel): "
+        );
+
+        if (userId == 0) {
+            System.out.println("-> Operation cancelled.");
+            return;
+        }
+
+        // Prevent admin from deleting their own account
+        if (userId == admin.user_id()) {
+            System.out.println(
+                    "-> [WARNING] You cannot delete your own active account."
+            );
+            return;
+        }
+
+        boolean exists = users.stream()
+                .anyMatch(u -> u.user_id() == userId);
+
+        if (!exists) {
+            System.out.println("-> [ERROR] User ID not found.");
+            return;
+        }
+
+        System.out.print(
+                "Are you sure you want to delete this account? (YES/NO): "
+        );
+
+        String confirmation = scanner.nextLine().trim();
+
+        if (!confirmation.equalsIgnoreCase("YES")) {
+            System.out.println("-> Deletion cancelled.");
+            return;
+        }
+
+        if (userDao.deleteUser(userId)) {
+
+            userDao.logActivity(
+                    admin.user_id(),
+                    "DELETE_USER",
+                    "Admin deleted user account with ID: " + userId
+            );
+
+            System.out.println("-> User account deleted successfully!");
+
+        } else {
+            System.out.println("-> [ERROR] Failed to delete user account.");
         }
     }
 }

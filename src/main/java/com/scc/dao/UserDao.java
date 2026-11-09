@@ -277,4 +277,20 @@ public class UserDao {
             System.err.println("Error displaying audit logs: " + e.getMessage());
         }
     }
+    public boolean deleteUser(int userId) {
+
+        String sql = "DELETE FROM users WHERE user_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, userId);
+
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error deleting user: " + e.getMessage());
+            return false;
+        }
+    }
     }
