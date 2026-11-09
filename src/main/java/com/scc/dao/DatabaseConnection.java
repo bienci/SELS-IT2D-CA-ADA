@@ -9,7 +9,6 @@ public class DatabaseConnection {
 
     private static final String DB_URL = "jdbc:sqlite:equipmentlendingsystem.db";
 
-
     public static Connection getConnection()   throws SQLException{
 
         Connection conn = DriverManager.getConnection(DB_URL);
