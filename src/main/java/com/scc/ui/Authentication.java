@@ -17,7 +17,7 @@ public class Authentication {
 
     public void   start(){
         System.out.println("\n=======================");
-        System.out.println("SCHOOL EQUIPMENT LENDING SYSTEM");
+        System.out.println("SCHOOL SPORTS EQUIPMENT LENDING SYSTEM");
         System.out.println("=======================");
         System.out.println("1. Login");
         System.out.println("2. Register");
