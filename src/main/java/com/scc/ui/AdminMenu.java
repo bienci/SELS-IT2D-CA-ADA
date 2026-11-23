@@ -1,6 +1,7 @@
-
 package com.scc.ui;
 
+import com.scc.dao.EquipmentDao;
+import com.scc.dao.LendingTransactionDao;
 import com.scc.dao.UserDao;
 import com.scc.model.user;
 
@@ -10,6 +11,8 @@ import java.util.Scanner;
 public class AdminMenu {
 
     private final UserDao userDao;
+    private final EquipmentDao equipmentDao = new EquipmentDao();
+    private final LendingTransactionDao transactionDao = new LendingTransactionDao();
     private final Scanner scanner;
 
     public AdminMenu(UserDao userDao, Scanner scanner) {
@@ -30,9 +33,11 @@ public class AdminMenu {
             System.out.println("4. Add New User");
             System.out.println("5. Update User Role / Status");
             System.out.println("6. Delete User Account");
-            System.out.println("7. View System Audit Logs");
-            System.out.println("8. Logout");
-            System.out.print("Choose an option (1-8): ");
+            System.out.println("7. Manage Equipment");
+            System.out.println("8. View Transactions");
+            System.out.println("9. View System Audit Logs");
+            System.out.println("10. Logout");
+            System.out.print("Choose an option (1-10): ");
 
             String choice = scanner.nextLine().trim();
 
@@ -43,8 +48,10 @@ public class AdminMenu {
                 case "4" -> addNewUser(admin);
                 case "5" -> updateUser(admin);
                 case "6" -> deleteUser(admin);
-                case "7" -> userDao.displayAuditLogs();
-                case "8" -> {
+                case "7" -> manageEquipment(admin);
+                case "8" -> viewTransactions();
+                case "9" -> userDao.displayAuditLogs();
+                case "10" -> {
                     userDao.logActivity(
                             admin.user_id(),
                             "LOGOUT",
@@ -225,7 +232,6 @@ public class AdminMenu {
     }
 
     private void addNewUser(user admin) {
-
         System.out.println("\n========== ADD NEW USER ==========");
 
         System.out.print("Enter Username: ");
@@ -253,7 +259,6 @@ public class AdminMenu {
 
         // Register the new user
         if (userDao.registerUser(username, password, role)) {
-
             userDao.logActivity(
                     admin.user_id(),
                     "ADD_USER",
@@ -263,13 +268,12 @@ public class AdminMenu {
 
             System.out.println("-> User registered successfully!");
             System.out.println("-> Account Status: PENDING");
-
         } else {
             System.out.println("-> [ERROR] Failed to register user.");
         }
     }
-    private void deleteUser(user admin) {
 
+    private void deleteUser(user admin) {
         System.out.println("\n========== DELETE USER ACCOUNT ==========");
 
         List<user> users = userDao.getAllUser();
@@ -317,7 +321,6 @@ public class AdminMenu {
         }
 
         if (userDao.deleteUser(userId)) {
-
             userDao.logActivity(
                     admin.user_id(),
                     "DELETE_USER",
@@ -325,10 +328,123 @@ public class AdminMenu {
             );
 
             System.out.println("-> User account deleted successfully!");
-
         } else {
             System.out.println("-> [ERROR] Failed to delete user account.");
         }
     }
-}
 
+    private void manageEquipment(user admin) {
+        boolean running = true;
+
+        while (running) {
+            System.out.println("\n========== EQUIPMENT MANAGEMENT ==========");
+            System.out.println("1. Add Equipment");
+            System.out.println("2. View Equipment");
+            System.out.println("3. Search Equipment");
+            System.out.println("4. Update Equipment");
+            System.out.println("5. Archive Equipment");
+            System.out.println("6. Back to Admin Dashboard");
+            System.out.print("Choose an option (1-6): ");
+
+            String choice = scanner.nextLine().trim();
+
+            switch (choice) {
+                case "1" -> {
+                    System.out.print("Equipment name: ");
+                    String name = scanner.nextLine().trim();
+
+                    System.out.print("Category: ");
+                    String category = scanner.nextLine().trim();
+
+                    System.out.print("Description: ");
+                    String description = scanner.nextLine().trim();
+
+                    int quantity = readIntInput("Quantity: ");
+
+                    if (equipmentDao.addEquipment(name, category, description, quantity, admin.user_id())) {
+                        userDao.logActivity(
+                                admin.user_id(),
+                                "ADD_EQUIPMENT",
+                                "Admin added equipment: " + name + " | Qty: " + quantity
+                        );
+                        System.out.println("-> Equipment added successfully.");
+                    } else {
+                        System.out.println("-> [ERROR] Unable to add equipment.");
+                    }
+                }
+                case "2" -> {
+                    System.out.println("\n========== ALL EQUIPMENT ==========");
+                    var equipmentList = equipmentDao.getAllEquipment();
+                    if (equipmentList.isEmpty()) {
+                        System.out.println("-> No Equipment Found");
+                    } else {
+                        equipmentList.forEach(System.out::println);
+                    }
+                }
+                case "3" -> {
+                    System.out.print("Search keyword: ");
+                    String keyword = scanner.nextLine().trim();
+
+                    System.out.println("\n========== SEARCH RESULTS ==========");
+                    var results = equipmentDao.searchEquipment(keyword);
+                    if (results.isEmpty()) {
+                        System.out.println("-> No Matching Equipment Found");
+                    } else {
+                        results.forEach(System.out::println);
+                    }
+                }
+                case "4" -> {
+                    int id = readIntInput("Equipment ID: ");
+
+                    System.out.print("New name: ");
+                    String name = scanner.nextLine().trim();
+
+                    System.out.print("Category: ");
+                    String category = scanner.nextLine().trim();
+
+                    System.out.print("Description: ");
+                    String description = scanner.nextLine().trim();
+
+                    int quantity = readIntInput("Total quantity: ");
+
+                    if (equipmentDao.updateEquipment(id, name, category, description, quantity, admin.user_id())) {
+                        userDao.logActivity(
+                                admin.user_id(),
+                                "UPDATE_EQUIPMENT",
+                                "Admin updated equipment ID: " + id + " | Name: " + name + " | Qty: " + quantity
+                        );
+                        System.out.println("-> Equipment updated successfully.");
+                    } else {
+                        System.out.println("-> [ERROR] Update failed.");
+                    }
+                }
+                case "5" -> {
+                    int id = readIntInput("Equipment ID to archive: ");
+
+                    if (equipmentDao.deleteEquipment(id, admin.user_id())) {
+                        userDao.logActivity(
+                                admin.user_id(),
+                                "ARCHIVE_EQUIPMENT",
+                                "Admin archived equipment ID: " + id
+                        );
+                        System.out.println("-> Equipment archived successfully.");
+                    } else {
+                        System.out.println("-> [ERROR] Cannot archive equipment.");
+                    }
+                }
+                case "6" -> running = false;
+                default -> System.out.println("-> [ERROR] Invalid Option.");
+            }
+        }
+    }
+
+    private void viewTransactions() {
+        System.out.println("\n========== EQUIPMENT TRANSACTIONS ==========");
+        var transactions = transactionDao.getAllTransactions();
+        if (transactions.isEmpty()) {
+            System.out.println("-> No Transactions Found");
+        } else {
+            transactions.forEach(System.out::println);
+        }
+    }
+}

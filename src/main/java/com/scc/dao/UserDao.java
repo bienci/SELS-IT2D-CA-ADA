@@ -159,7 +159,7 @@ public class UserDao {
         return pendingList;
     }
 
-    public boolean approveUser(int userId) {
+    public static boolean approveUser(int userId) {
         String sql = "UPDATE users SET status = 'APPROVED' WHERE user_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
