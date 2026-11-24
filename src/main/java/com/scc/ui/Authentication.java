@@ -37,7 +37,7 @@ public class Authentication {
                     System.out.print("Enter password: ");
                     String pass = sc.nextLine();
 
-                    System.out.println("Select role [1] CUSTODIAN |  [2] ADMIN: ");
+                    System.out.println("Select role [1] CUSTODIAN |  [2] ADMIN | [3] STUDENT: ");
                     int roleChoice = sc.nextInt();
                     sc.nextLine(); // consume leftover newline so next sc.nextLine() works cleanly
                     String role;
@@ -48,6 +48,10 @@ public class Authentication {
                         case 2:
                             role = "ADMIN";
                             break;
+                        case 3:
+                            role = "STUDENT";
+                            break;
+
                         default:
                             role = null;
                     }
