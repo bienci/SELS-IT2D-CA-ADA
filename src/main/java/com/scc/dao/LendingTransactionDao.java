@@ -246,21 +246,21 @@ public class LendingTransactionDao {
 
     // ==================== REJECT REQUEST ====================
 
+
     public boolean rejectRequest(int transactionId, int custodianId,
                                  String reason) {
 
         String sql = """
-            UPDATE transactions
-            SET status = 'REJECTED'
-            WHERE transaction_id = ?
-            AND status = 'PENDING'
-            """;
+        UPDATE transactions
+        SET status = 'REJECTED'
+        WHERE transaction_id = ?
+        AND status = 'PENDING'
+        """;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, reason);
-            ps.setInt(2, transactionId);
+            ps.setInt(1, transactionId);
 
             if (ps.executeUpdate() > 0) {
 
