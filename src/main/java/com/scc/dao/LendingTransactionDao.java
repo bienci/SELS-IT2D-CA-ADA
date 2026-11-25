@@ -59,7 +59,7 @@ public class LendingTransactionDao {
 
                 String transactionSql = """
                     INSERT INTO transactions
-                    (user_id, expected_return_date, status, transaction_item)
+                    (user_id, expected_return_date, status, transaction_items)
                     VALUES (?, ?, 'PENDING', ?)
                     """;
 
@@ -119,7 +119,7 @@ public class LendingTransactionDao {
             throws SQLException {
 
         String sql = """
-            SELECT transaction_item
+            SELECT transaction_items
             FROM transactions
             WHERE transaction_id = ?
             """;
@@ -132,7 +132,7 @@ public class LendingTransactionDao {
 
                 if (rs.next()) {
 
-                    String itemInfo = rs.getString("transaction_item");
+                    String itemInfo = rs.getString("transaction_items");
 
                     if (itemInfo == null) {
                         return null;
@@ -453,7 +453,7 @@ public class LendingTransactionDao {
         return getTransactions("""
             SELECT t.transaction_id, t.user_id, u.username,
                    t.request_date, t.expected_return_date,
-                   t.status, t.transaction_item
+                   t.status, t.transaction_items
             FROM transactions t
             JOIN users u ON t.user_id = u.user_id
             ORDER BY t.transaction_id DESC
@@ -465,7 +465,7 @@ public class LendingTransactionDao {
         return getTransactions("""
             SELECT t.transaction_id, t.user_id, u.username,
                    t.request_date, t.expected_return_date,
-                   t.status, t.transaction_item
+                   t.status, t.transaction_items
             FROM transactions t
             JOIN users u ON t.user_id = u.user_id
             WHERE t.user_id = ?
@@ -478,7 +478,7 @@ public class LendingTransactionDao {
         return getTransactions("""
             SELECT t.transaction_id, t.user_id, u.username,
                    t.request_date, t.expected_return_date,
-                   t.status, t.transaction_item
+                   t.status, t.transaction_items
             FROM transactions t
             JOIN users u ON t.user_id = u.user_id
             WHERE t.status = 'PENDING'
@@ -491,7 +491,7 @@ public class LendingTransactionDao {
         return getTransactions("""
             SELECT t.transaction_id, t.user_id, u.username,
                    t.request_date, t.expected_return_date,
-                   t.status, t.transaction_item
+                   t.status, t.transaction_items
             FROM transactions t
             JOIN users u ON t.user_id = u.user_id
             WHERE t.status = 'APPROVED'
@@ -504,7 +504,7 @@ public class LendingTransactionDao {
         return getTransactions("""
             SELECT t.transaction_id, t.user_id, u.username,
                    t.request_date, t.expected_return_date,
-                   t.status, t.transaction_item
+                   t.status, t.transaction_items
             FROM transactions t
             JOIN users u ON t.user_id = u.user_id
             WHERE t.status = 'RETURN_REQUESTED'
@@ -534,7 +534,7 @@ public class LendingTransactionDao {
                             rs.getString("request_date");
 
                     String transactionItem =
-                            rs.getString("transaction_item");
+                            rs.getString("transaction_items");
 
                     list.add(new LendingTransaction(
                             rs.getInt("transaction_id"),
@@ -564,7 +564,7 @@ public class LendingTransactionDao {
         return getTransactions("""
         SELECT t.transaction_id, t.user_id, u.username,
                t.request_date, t.expected_return_date,
-               t.status, t.transaction_item
+               t.status, t.transaction_items
         FROM transactions t
         JOIN users u ON t.user_id = u.user_id
         WHERE t.user_id = ?

@@ -150,36 +150,39 @@ public class EquipmentDao {
         return false;
     }
 
+
     public boolean deleteEquipment(int id, int adminId) {
 
         String sql = """
-            UPDATE equipment SET status='INACTIVE'
-            WHERE equipment_id=?
-              AND available_quantity=quantity
-              AND NOT EXISTS (
-                SELECT 1 FROM transaction_items
-                WHERE equipment_id=?
-              )
-        """;
+        UPDATE equipment
+        SET status='INACTIVE'
+        WHERE equipment_id=?
+          AND available_quantity=quantity
+          AND status <> 'INACTIVE'
+    """;
+
+        boolean archived = false;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ps.setInt(2, id);
 
-            if (ps.executeUpdate() > 0) {
-                logDao.logAction(adminId, "EQUIPMENT_ARCHIVED",
-                        "Archived equipment ID: " + id);
-                return true;
-            }
+            archived = ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("[ERROR] " + e.getMessage());
+            return false;
         }
 
-        return false;
+        if (archived) {
+            logDao.logAction(adminId, "EQUIPMENT_ARCHIVED",
+                    "Archived equipment ID: " + id);
+        }
+
+        return archived;
     }
+
 
     private Equipment mapEquipment(ResultSet rs) throws SQLException {
 
