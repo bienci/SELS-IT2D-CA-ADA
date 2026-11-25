@@ -251,7 +251,7 @@ public class LendingTransactionDao {
 
         String sql = """
             UPDATE transactions
-            SET status = 'REJECTED', remarks = ?
+            SET status = 'REJECTED'
             WHERE transaction_id = ?
             AND status = 'PENDING'
             """;
